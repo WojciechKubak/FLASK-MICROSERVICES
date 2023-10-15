@@ -1,4 +1,4 @@
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import DeclarativeBase, sessionmaker
 from sqlalchemy import Engine
 from dataclasses import dataclass
 from functools import wraps
@@ -8,9 +8,11 @@ from typing import Callable, Any
 @dataclass
 class CrudRepository:
     _engine: Engine
-    _entity_type: type
+    _entity: type[DeclarativeBase]
 
     def __post_init__(self):
+        self._entity_type = type(self._entity)
+
         session_maker = self.create_session()
         self.session = session_maker()
 

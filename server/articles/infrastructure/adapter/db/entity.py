@@ -7,6 +7,23 @@ from typing import Any
 Base = declarative_base()
 
 
+class Category(Base):
+
+    __tablename__ = 'categories'
+
+    id: Mapped[int] = mapped_column(Integer(), primary_key=True)
+    name: Mapped[str] = mapped_column(String(), nullable=True)
+    description: Mapped[str] = mapped_column(String(255))
+    created_at: Mapped[datetime] = mapped_column(default=func.utc_timestamp())
+    updated_at: Mapped[datetime] = mapped_column(default=func.utc_timestamp(), onupdate=func.utc_timestamp())
+
+    def to_json(self) -> dict[str, Any]:
+        return {
+            'name': self.name,
+            'description': self.description,
+        }
+
+
 class Article(Base):
 
     __tablename__ = 'articles'
@@ -27,23 +44,6 @@ class Article(Base):
             'content': self.content,
             'publication_date': self.publication_date,
             'category_id': self.category_id,
-        }
-
-
-class Category(Base):
-
-    __tablename__ = 'categories'
-
-    id: Mapped[int] = mapped_column(Integer(), primary_key=True)
-    name: Mapped[str] = mapped_column(String(), nullable=True)
-    description: Mapped[str] = mapped_column(String(255))
-    created_at: Mapped[datetime] = mapped_column(default=func.utc_timestamp())
-    updated_at: Mapped[datetime] = mapped_column(default=func.utc_timestamp(), onupdate=func.utc_timestamp())
-
-    def to_json(self) -> dict[str, Any]:
-        return {
-            'name': self.name,
-            'description': self.description,
         }
 
 
