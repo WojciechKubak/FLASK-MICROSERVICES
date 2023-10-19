@@ -17,7 +17,7 @@ class CrudRepository:
         self.session = session_maker()
 
     def create_session(self) -> sessionmaker:
-        return sessionmaker(bind=self._engine, expire_on_commit=False)
+        return sessionmaker(bind=self._engine)
 
     def session_scope(self):
         def decorator(method: Callable):

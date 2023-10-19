@@ -1,16 +1,24 @@
+from dataclasses import dataclass, field
 from typing import Self, Any
 
 
+@dataclass
 class MySQLConnectionStringBuilder:
-    def __init__(self, params: dict[str, Any] = None):
-        params = {} if not params else params
-        self._config = {
-            'host': 'localhost',
-            'database': 'db_1',
-            'user': 'user',
-            'password': 'user1234',
-            'port': 3307
-        } | params
+    _config: dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self):
+        if not self._config:
+            self._config = {
+                'host': 'localhost',
+                'database': 'db_1',
+                'user': 'user',
+                'password': 'user1234',
+                'port': 3307
+            }
+
+    def host(self, new_host: str) -> Self:
+        self._config['host'] = new_host
+        return self
 
     def user(self, new_user: str) -> Self:
         self._config['user'] = new_user
@@ -29,8 +37,8 @@ class MySQLConnectionStringBuilder:
         return self
 
     def build(self) -> str:
-        return f"mysql://{self._config['user']}:{self._config['password']}" \
-            f"{self._config['host']}:{self._config['port']}/{self._config['database']}"
+        return f"mysql://{self._config['user']}:{self._config['password']}@" \
+               f"{self._config['host']}:{self._config['port']}/{self._config['database']}"
 
     @classmethod
     def builder(cls) -> Self:

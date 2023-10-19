@@ -9,5 +9,4 @@ COPY /Pipfile.lock /Pipfile /app/
 
 RUN pip install pipenv && pipenv install --system --deploy --ignore-pipfile
 
-COPY /.env /app
 COPY /server/translations /app
