@@ -1,4 +1,4 @@
-from infrastructure.adapter.db.connection import MySQLConnectionStringBuilder
+from infrastructure.db.connection import MySQLConnectionStringBuilder
 from dataclasses import dataclass
 from typing import Type
 import os

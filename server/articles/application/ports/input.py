@@ -1,20 +1,25 @@
+from domain.model import Article
 from abc import ABC, abstractmethod
-from typing import Optional
 
 
 class ArticleInputPort(ABC):
+
     @abstractmethod
-    def get_article(self, article_id: int) -> Optional[dict]:
+    def create_article(self, article: Article) -> Article:
         pass
 
     @abstractmethod
-    def create_article(self, article_data: dict) -> dict:
+    def update_article(self, article: Article) -> Article:
         pass
 
     @abstractmethod
-    def update_article(self, article_id: int, article_data: dict) -> Optional[dict]:
+    def delete_article(self, id_: int) -> int:
         pass
 
     @abstractmethod
-    def delete_article(self, article_id: int) -> None:
+    def get_article_by_id(self, id_: int) -> Article | None:
+        pass
+
+    @abstractmethod
+    def get_article_by_title(self, title: str) -> Article | None:
         pass

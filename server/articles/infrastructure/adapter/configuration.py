@@ -1,0 +1,4 @@
+from infrastructure.adapter.adapter import ArticleOutputPortAdapter
+from infrastructure.db.configuration import article_repository
+
+article_output_port_adapter = ArticleOutputPortAdapter(article_repository)

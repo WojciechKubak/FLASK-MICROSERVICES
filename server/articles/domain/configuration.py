@@ -1,0 +1,4 @@
+from infrastructure.adapter.configuration import article_output_port_adapter
+from domain.service import ArticleService
+
+domain_article_service = ArticleService(article_output_port_adapter)
