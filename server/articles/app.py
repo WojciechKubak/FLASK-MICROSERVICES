@@ -16,4 +16,6 @@ def create_app() -> Flask:
         def index() -> Response:
             return make_response({'message': 'Articles home page'}, 200)
 
+        # test comment
+
         return app
