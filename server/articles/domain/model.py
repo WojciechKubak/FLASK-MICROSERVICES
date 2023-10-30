@@ -1,68 +1,115 @@
-from infrastructure.db.entity import ArticleEntity
-from dataclasses import dataclass
+from infrastructure.db.entity import ArticleEntity, CategoryEntity, TagEntity
+from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Self
-
-
-@dataclass
-class Category:
-    name: str
-    description: str
-
-
-# todo (5):
-"""
-    Uświadomiłem sobie, że w ramach modeli domenowych będę jednak potrzebował id_, chciałbym je tutaj dodać, ale
-    zastanawiam się, jak to zrobić, chodzi o to, że:
-    
-    musiałbym ustawić id_ jako: id_: int = field(default=None),
-    
-    no bo modele tworzone przykładowo w ramach add_article po samej konwersji z dict'a nie posiadają id, 
-    przy takiej implementacji, jako, że pole id_ jest defaultowe to musi być ustawione w taki sposób:
-    
-    @dataclass
-        class Article:
-        title: str
-        content: str
-        publication_date: datetime
-        category_id: int
-        id_: int = field(default=None)
-    
-    co już samo w sobie wygląda dziwnie, 
-    
-    druga kwestia to konwersja, jeżeli obiekt z id_ = None przekonwertuję na model bazodanowy, to dostanę błąd (chyba), 
-    z drugiej strony, jeżeli te id_ będzie, to raczej mam do czynienia z metodą put (nowe pola + istniejące id). 
-
-    oczywiście można to obsłużyć w ramach metod to_entity(), ale wydaje mi się, że jest lepsze | łatwiejsze rozwiązanie
-    którego nie za bardzo widzę
-"""
+from typing import Self, Any, Optional
 
 
 @dataclass
 class Article:
-    id: int | None = None
+    id_: int | None
     title: str
     content: str
     publication_date: datetime
     category_id: int
+    tags: list[int] = field(default_factory=list)
 
     def to_entity(self) -> ArticleEntity:
-        return ArticleEntity(**self.__dict__)
+        entity_data = {
+            'title': self.title,
+            'content': self.content,
+            'publication_date': self.publication_date,
+            'category_id': self.category_id
+        }
+        return ArticleEntity(**entity_data | {'id': self.id_} if self.id_ else entity_data)
 
     def to_json(self) -> dict[str, Any]:
-        return self.__dict__
+        return {
+            'id': self.id_,
+            'title': self.title,
+            'content': self.content,
+            'publication_date': self.publication_date,
+            'category_id': self.category_id,
+            'tags': self.tags
+        }
 
     @classmethod
     def from_json(cls, data: dict[str, Any]) -> Self:
-        return cls(**data)
+        return cls(**data | {'id_': data.pop('id')})
+
+    @classmethod
+    def from_entity(cls, article: ArticleEntity) -> Self:
+        return cls(
+            id_=article.id,
+            title=article.title,
+            content=article.content,
+            publication_date=article.publication_date,
+            category_id=article.category_id,
+            tags=[tag.id for tag in article.tags] if 'tags' in article.__dict__ else []
+        )
 
 
 @dataclass
-class Tag:
+class Category:
+    id_: int | None
     name: str
+    description: str
+
+    def to_entity(self) -> CategoryEntity:
+        entity_data = {
+            'id': self.id_,
+            'name': self.name,
+            'description': self.description
+        }
+        return CategoryEntity(**entity_data | {'id': self.id_} if self.id_ else entity_data)
+
+    def to_json(self) -> dict[str, Any]:
+        return {
+            'id': self.id_,
+            'name': self.name,
+            'description': self.description,
+        }
+
+    @classmethod
+    def from_json(cls, data: dict[str, Any]) -> Self:
+        return cls(**data | {'id_': data.pop('id')})
+
+    @classmethod
+    def from_entity(cls, category: CategoryEntity) -> Self:
+        return cls(
+            id_=category.id,
+            name=category.name,
+            description=category.description,
+        )
 
 
-@dataclass
-class ArticleTag:
-    article_id: int
-    tag_id: int
+@dataclass(frozen=True)
+class Tag:
+    id_: Optional[int] = None
+    name: Optional[str] = None
+
+    def to_entity(self) -> TagEntity:
+        entity_data = {
+            'name': self.name
+        }
+        return TagEntity(**entity_data | {'id': self.id_} if self.id_ else entity_data)
+
+    def to_json(self) -> dict[str, Any]:
+        return {
+            'id': self.id_,
+            'name': self.name,
+        }
+
+    @classmethod
+    def from_json(cls, data: dict[str, Any]) -> Self:
+        return cls(
+            id_=data.get('id'),
+            name=data.get('name'),
+        )
+
+    @classmethod
+    def from_entity(cls, tag: TagEntity) -> Self:
+        return cls(
+            id_=tag.id,
+            name=tag.name,
+            articles=[Article.from_entity(article) for article in tag.articles]
+        )

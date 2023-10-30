@@ -1,4 +1,5 @@
-from infrastructure.adapter.adapter import ArticleOutputPortAdapter
-from infrastructure.db.configuration import article_repository
+from infrastructure.adapter.adapter import ArticleOutputPortAdapter, CategoryOutputPortAdapter
+from infrastructure.db.configuration import article_repository, category_repository
 
 article_output_port_adapter = ArticleOutputPortAdapter(article_repository)
+category_output_port_adapter = CategoryOutputPortAdapter(category_repository)

@@ -1,17 +1,9 @@
-from infrastructure.db.entity import ArticleEntity
+from infrastructure.db.entity import ArticleEntity, CategoryEntity
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import Engine
 from dataclasses import dataclass, field
-from functools import wraps
 from typing import Callable, Any
-
-
-# todo (6):
-"""
-    Trochę przyszłościowo, przy dodatniu artykuły będę chciał określić id usera który je dodał, wiadomo, że
-    nie będzie to foreign key tylko zwykły id, ale jak będę w stanie zlokalizować tego usera?
-    teoretycznie, mogę parsować JWT i to pozyskać, ale czy są inne strategie?
-"""
+from functools import wraps
 
 
 def transactional(method: Callable) -> Callable:
@@ -37,7 +29,7 @@ class CrudRepository:
 
     def __post_init__(self):
         session_maker = sessionmaker(bind=self._engine, expire_on_commit=False)
-        self.session = session_maker()
+        self.session = session_maker(expire_on_commit=False)
 
     @transactional
     def add(self, item: Any) -> None:
@@ -65,3 +57,13 @@ class ArticleRepository(CrudRepository):
     @transactional
     def find_by_title(self, title: str) -> type | None:
         return self.session.query(self._entity).filter_by(title=title).first()
+
+
+@dataclass
+class CategoryRepository(CrudRepository):
+    _engine: Engine
+    _entity: type = field(default=CategoryEntity, init=False)
+
+    @transactional
+    def find_by_name(self, name: str) -> type | None:
+        return self.session.query(self._entity).filter_by(name=name).first()

@@ -1,4 +1,7 @@
-from infrastructure.api.routes import ArticleResource
+from infrastructure.api.routes import (
+    ArticleResource, ArticleIdResource,
+    CategoryResource, CategoryIdResource
+)
 from config import get_config
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask import Flask, Response, make_response
@@ -22,6 +25,9 @@ def create_app() -> Flask:
 
         api = Api(app)
         api.add_resource(ArticleResource, '/')
+        api.add_resource(ArticleIdResource, '/<int:id_>')
+        api.add_resource(CategoryResource, '/categories')
+        api.add_resource(CategoryIdResource, '/categories/<int:id_>')
 
         @app.route('/')
         def index() -> Response:

@@ -60,7 +60,7 @@ services:
       dockerfile: /server/articles/Dockerfile
     command: gunicorn --bind 0.0.0.0:8001 --workers 4 'app:create_app()' --reload
     volumes:
-      - ./:/webapp
+      - ./server/articles:/articles
     depends_on:
       mysql:
         condition: service_healthy
@@ -79,7 +79,7 @@ services:
       dockerfile: /server/translations/Dockerfile
     command: gunicorn --bind 0.0.0.0:8002 --workers 4 'app:create_app()' --reload
     volumes:
-      - ./:/webapp
+      - ./:/translations
     depends_on:
       mysql:
         condition: service_healthy
@@ -98,7 +98,7 @@ services:
       dockerfile: /server/users/Dockerfile
     command: gunicorn --bind 0.0.0.0:8003 --workers 4 'app:create_app()' --reload
     volumes:
-      - ./:/webapp
+      - ./:/users
     depends_on:
       mysql:
         condition: service_healthy
